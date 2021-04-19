@@ -1,0 +1,65 @@
+spring:
+  cloud:
+    config:
+      name: schedule-job
+      profile: dev
+      label: master
+      # 配置中心uri
+      uri: http://127.0.0.1:53020
+
+#server:
+#  port: 56030
+#  tomcat:
+#    remote-ip-header: x-forwarded-for
+#    protocol-header: x-forwarded-proto
+#  use-forward-headers: true
+#  servlet:
+#    context-path: /job
+#
+#spring:
+#  application:
+#    name: job-service
+#  main:
+#    allow-bean-definition-overriding: true
+#    banner-mode: 'off'
+#  zipkin:
+#    # ZipKin服务器地址
+#    baseUrl: http://192.168.158.160:9411
+#    sender:
+#      # 设置以http方法传输
+#      type: web
+#    # 关闭服务发现, 否则Spring Cloud会把zipkin的url当做服务名称
+#    discovery-client-enabled: false
+#  sleuth:
+#    sampler:
+#      # 全采集
+#      probability: 1
+## eureka客户端配置
+#eureka:
+#  client:
+#    service-url:
+#      # eureka注册中心地址
+#      defaultZone: http://127.0.0.1:53010/eureka
+#  instance:
+#    # 使用ip地址进行注册
+#    ip-address: 127.0.0.1
+#    # 偏向ip地址注册
+#    prefer-ip-address: true
+#
+## 健康检查
+#management:
+#  endpoint:
+#    health:
+#      # 开启详细信息 -> 访问 actuator/health
+#      show-details: always
+#  endpoints:
+#    web:
+#      exposure:
+#        # 激活所有的端点, 默认只有health和info开启的
+#        include: '*'
+#      base-path: /act
+#
+## 自定义配置
+#recharge:
+#  # zookeeper
+#  selectMasterZookeeper: 192.168.158.160:2181

@@ -1,0 +1,29 @@
+server:
+  port: 53010
+
+spring:
+  application:
+    name: recharge-eureka-server
+  main:
+    allow-bean-definition-overriding: true
+
+eureka:
+  server:
+    # 关闭自我保护, 默认是开启的, 我们一般都是默认开启.
+    enable-self-preservation: true
+    # 剔除服务间隔
+    eviction-interval-timer-in-ms: 5000
+  instance:
+    # 偏向IP
+    prefer-ip-address: true
+    # 实例ID, 最终呈现 127.0.0.1:8080
+    instance-id: ${spring.cloud.client.ip-address}:${server.port}
+  client:
+    # 服务拉取间隔
+    registry-fetch-interval-seconds: 3
+    # 是否将自己注册到注册服务中心
+    register-with-eureka: false
+    # 是否从eureka服务注册中心获取注册信息
+    fetch-registry: false
+    service-url:
+      defaultZone: http://${spring.cloud.client.ip-address}:${server.port}/eureka/

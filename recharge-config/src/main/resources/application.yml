@@ -1,0 +1,27 @@
+server:
+  port: 53020
+
+spring:
+  application:
+    name: configuration-server
+  cloud:
+    config:
+      server:
+        git:
+          uri: 1111
+          username: 111
+          password: 111
+  rabbitmq:
+    # 推荐写上用户名以及端口号, 密码
+    host: 192.168.158.160
+    username: guest
+    password: guest
+    port: 5672
+
+# 暴露触发消息总线的地址
+management:
+  endpoints:
+    web:
+      exposure:
+        # http://127.0.0.1:56020/actuator/bus-refresh
+        include: bus-refresh

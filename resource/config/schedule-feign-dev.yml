@@ -1,0 +1,46 @@
+server:
+  port: 56020
+  tomcat:
+    remote-ip-header: x-forwarded-for
+    protocol-header: x-forwarded-proto
+  use-forward-headers: true
+  servlet:
+    context-path: /feign
+
+spring:
+  application:
+    name: feign-service
+  main:
+    allow-bean-definition-overriding: true
+    banner-mode: 'off'
+  rabbitmq:
+    # 推荐写上用户名以及端口号, 密码
+    host: 192.168.158.160
+    username: guest
+    password: guest
+    port: 5672
+
+# eureka客户端配置
+eureka:
+  client:
+    service-url:
+      # eureka注册中心地址
+      defaultZone: http://127.0.0.1:53010/eureka
+  instance:
+    # 使用ip地址进行注册
+    ip-address: 127.0.0.1
+    # 偏向ip地址注册
+    prefer-ip-address: true
+
+# 健康检查
+management:
+  endpoint:
+    health:
+      # 开启详细信息 -> 访问 actuator/health
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        # 激活所有的端点, 默认只有health和info开启的
+        include: '*'
+      base-path: /act

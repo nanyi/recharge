@@ -1,0 +1,177 @@
+server:
+  port: 56010
+  tomcat:
+    remote-ip-header: x-forwarded-for
+    protocol-header: x-forwarded-proto
+  use-forward-headers: true
+  servlet:
+    context-path: /schedule
+
+spring:
+  application:
+    name: schedule-service
+  main:
+    allow-bean-definition-overriding: true
+    banner-mode: 'off'
+  datasource:
+    druid:
+      initial-size: 5
+      min-idle: 5
+      max-active: 20
+      max-wait: 60000
+      time-between-eviction-runs-millis: 60000
+      min-evictable-idle-time-millis: 300000
+      validation-query: SELECT 1 FROM DUAL
+      test-while-idle: true
+      test-on-borrow: true
+      test-on-return: false
+      pool-prepared-statements: true
+      max-pool-prepared-statement-per-connection-size: 20
+      filter:
+        stat:
+          slow-sql-millis: 1
+          log-slow-sql: true
+      filters: config,stat,wall,log4j2
+      web-stat-filter:
+        enabled: true
+        url-pattern: /*
+        exclusions: "*.js,*.gif,*.jpg,*.css,*.ioc,/druid/*"
+        session-stat-enable: false
+        session-stat-max-count: 1000
+        principal-cookie-name: admin
+        principal-session-name: admin
+        profile-enable: true
+      stat-view-servlet:
+        enabled: true
+        url-pattern: /druid/*
+        # 白名单
+        allow: 127.0.0.1
+        # 黑名单
+        deny: 192.168.158.1
+        reset-enable: false
+        login-password: admin
+        login-username: admin
+      aop-patterns: com.recharge.*.service.*
+  redis:
+    host: 192.168.158.160
+    password: yueliminvc@outlook.com
+    port: 6379
+  rabbitmq:
+    # 推荐写上用户名以及端口号, 密码
+    host: 192.168.158.160
+    username: guest
+    password: guest
+    port: 5672
+  zipkin:
+    # ZipKin服务器地址
+    baseUrl: http://192.168.158.160:9411
+    sender:
+      # 设置以http方法传输
+      type: web
+    # 关闭服务发现, 否则Spring Cloud会把zipkin的url当做服务名称
+    discovery-client-enabled: false
+  sleuth:
+    sampler:
+      # 全采集
+      probability: 1
+  shardingsphere:
+    datasource:
+      ds0:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        type: com.alibaba.druid.pool.DruidDataSource
+        url: jdbc:mysql://192.168.158.160:3306/recharge_schedule0?useUnicode=true&characterEncoding=utf8&characterSetResults=utf8
+        username: root
+        password: yueliminvc@outlook.com
+      ds1:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        type: com.alibaba.druid.pool.DruidDataSource
+        url: jdbc:mysql://192.168.158.160:3306/recharge_schedule1?useUnicode=true&characterEncoding=utf8&characterSetResults=utf8
+        username: root
+        password: yueliminvc@outlook.com
+      names: ds0,ds1
+    sharding:
+      tables:
+        task_info:
+          actual-data-nodes: ds$->{0..1}.task_info_$->{0..1}
+          # 主键生成策略
+          key-generator:
+            column: task_id
+            type: SNOWFLAKE
+          # 分库策略
+          database-strategy:
+            inline:
+              sharding-column: task_type
+              algorithm-expression: ds$->{task_type % 2}
+          # 分表策略
+          table-strategy:
+            inline:
+              sharding-column: priority
+              algorithm-expression: task_info_$->{priority % 2}
+        task_info_logs:
+          actual-data-nodes: ds$->{0..1}.task_info_logs_2021_$->{4..5}
+          # 分库策略
+          database-strategy:
+            inline:
+              sharding-column: task_type
+              algorithm-expression: ds$->{task_type % 2}
+          key-generator:
+            column: task_id
+            type: SNOWFLAKE
+          # 分表策略 按月分库
+          table-strategy:
+            standard:
+              precise-algorithm-class-name: com.recharge.schedule.config.ShardingAlgorithmMonth
+              sharding-column: execute_time
+
+eureka:
+  client:
+    service-url:
+      # eureka注册中心地址
+      defaultZone: http://127.0.0.1:53010/eureka
+  instance:
+    # 使用ip地址进行注册
+    ip-address: 127.0.0.1
+    # 偏向ip地址注册
+    prefer-ip-address: true
+
+management:
+  endpoint:
+    health:
+      # 开启详细信息 -> 访问 actuator/health
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        # 激活所有的端点, 默认只有health和info开启的
+        include: '*'
+      base-path: /act
+
+# MybatisPlus
+mybatis-plus:
+  configuration:
+    cache-enabled: false
+    # 驼峰转换
+    map-underscore-to-camel-case: true
+  global-config:
+    banner: false
+    db-config:
+      id-type: auto
+  # 扫描实体类
+  type-aliases-package: com.recharge.*.entity
+  # 扫描自定义SQL
+  mapper-locations: classpath:com/recharge/*/mapper/*.xml
+
+# 接口文档是否开启
+swagger:
+  enable: true
+
+# 自定义配置
+recharge:
+  # 预加载时间配置
+  reload: 1
+  # zookeeper
+  selectMasterZookeeper: 192.168.158.160:2181
+
+# 日志配置
+logging:
+  config: classpath:logback-spring.xml
